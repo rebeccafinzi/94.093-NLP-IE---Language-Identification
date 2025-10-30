@@ -24,6 +24,20 @@ def clean_text_fr(text):
     text = re.sub(r'\s+', ' ', text).strip()  # multiple spaces
     return text
 
+def clean_text_ru(text):
+    text = re.sub(r'\n', ' ', text)  # Remove newline characters
+    # Keep only Russian characters (А-Я, а-я, Ё/ё), digits, spaces, frequent used symbol
+    text = re.sub(r"[^А-Яа-яЁё0-9\s\.\-’ʼ']", "", text)
+    text = re.sub(r'\s+', ' ', text).strip()  # multiple spaces
+    return text
+
+def clean_text_be(text):
+    text = re.sub(r'\n', ' ', text)  # Remove newline characters
+    # Keep only Belarusian characters (А-Я, а-я, Ё/ё, І/і, Ў/ў), digits, spaces, frequent used symbol
+    text = re.sub(r"[^А-Яа-яЁёІіЎў0-9\s\.\-’ʼ']", "", text)
+    text = re.sub(r'\s+', ' ', text).strip()  # multiple spaces
+    return text
+
 def process_and_save_conllu(df, lang, batch_size=50, processors="tokenize,pos,lemma", output_path=None):
     texts = [t for t in df["clean_text"].astype(str).tolist() if t.strip()]
     
@@ -69,7 +83,7 @@ if __name__ == "__main__":
         "-lang",
         "--language",
         required=True,
-        help="e.g. en, de, it, es, ko, "
+        help="e.g. en, de, it, es, ko, ru, be"
     )
     parser.add_argument(
         "-n",
