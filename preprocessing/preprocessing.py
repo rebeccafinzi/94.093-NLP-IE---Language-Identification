@@ -5,7 +5,7 @@ import stanza
 from stanza.utils.conll import CoNLL
 import argparse
 
-PUNCT = r"\.,;:!\?\-\(\)\"'«»“”‘’…¿¡"
+PUNCT = r"\.,;:!\?\-\(\)\"'«»“”‘’…¿¡/%"
 
 def clean_text_pt(text):
     text = re.sub(r'\n', ' ', text)  # Remove newline characters
