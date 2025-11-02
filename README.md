@@ -32,17 +32,17 @@ For this project, we selected **ten languages**, including both well-resourced a
 
 The preprocessing pipeline was designed to produce a **clean, consistent, and standardized multilingual dataset**. The following steps were applied:
 
-1. **Removal of punctuation and symbols** – All non-alphanumeric characters, special symbols, and unnecessary whitespace were removed to reduce noise.
+1. **Removal of unwanted characters** – Non-language-specific characters, extra symbols, and unnecessary whitespace were removed. Each language has a tailored cleaning function to retain only valid characters for that language.
    
-2. **Lowercasing** – Converted all text to lowercase to reduce variation caused by case differences.
+2. **Whitespace normalization** – Multiple consecutive spaces and newlines were replaced with a single space.
 
-3. **Tokenization** – Split text into individual tokens (words or meaningful sub-units) while respecting language-specific rules.
+3. **Tokenization** – Text was tokenized using Stanza, a state-of-the-art NLP library that respects language-specific rules.
  
 4. **Stopword removal** – Removal of very common words such as "the", "and", "di", "e".
 
 5. **Stemming / Lemmatization** – Reduce tokens to their root or base forms.
 
-6. **Saving in CoNLL format** – Finally, save the cleaned and preprocessed data in CoNLL format for use in NLP models.
+6. **Saving in CoNLL format** – Finally, the cleaned and tokenized text was saved in CoNLL-U format, suitable for NLP model training and evaluation.  
    
 
 
