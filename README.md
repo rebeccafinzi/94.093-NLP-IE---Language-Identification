@@ -36,7 +36,7 @@ The preprocessing pipeline was designed to produce a **clean, consistent, and st
    
 2. **Whitespace normalization** – Multiple consecutive spaces and newlines were replaced with a single space.
 
-3. **Tokenization** – Text was tokenized using Stanza, a state-of-the-art NLP library that respects language-specific rules.
+3. **Tokenization** – Text was tokenized using **Stanza**, a state-of-the-art NLP library that respects language-specific rules.
  
 4. **Stopword removal** – Removal of very common words such as "the", "and", "di", "e".
 
