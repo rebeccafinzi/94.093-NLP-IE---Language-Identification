@@ -95,7 +95,7 @@ python preprocessing.py -lang en -n 10000
 
 1. **Data Bias (Sample Size Differences)**  
    - The amount of available data varies significantly across languages due to differences in resource availability.  
-   - As a result, some languages (e.g., Tamil, Belarusian) have fewer samples compared to high-resource languages like English or Spanish.  
+   - As a result, some languages (e.g., Tamil, Belarusian) have fewer samples compared to high-resource languages like English or Spanish.
    This imbalance must be considered during model training and evaluation to prevent bias.
 
 2. **Tokenization Accuracy**  
