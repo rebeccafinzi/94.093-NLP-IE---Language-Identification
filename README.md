@@ -13,7 +13,7 @@
 The objective of this project is to build a **multilingual dataset for automatic language identification**. Language identification is a fundamental NLP task that involves automatically determining the language of a given text segment.
 
 ## Dataset Used
-multilingual Wikipedia dataset  
+The **multilingual Wikipedia dataset** available on Hugging Face:  
 https://huggingface.co/datasets/wikimedia/wikipedia
 
 ## Languages Selected
