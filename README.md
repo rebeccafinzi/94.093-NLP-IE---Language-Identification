@@ -15,16 +15,16 @@ The objective of this project is to build a **multilingual dataset for automatic
 ## Languages Selected
 For this project, we selected **ten languages**, including both well-resourced and under-resourced languages. The chosen languages are:  
 
-- Italian  
-- Tamil  
-- Belarusian  
-- Russian  
-- German  
-- Spanish  
-- English  
-- Portuguese  
-- French  
-- Korean  
+- Italian (it)  
+- Tamil (ta)   
+- Belarusian (be)   
+- Russian (ru)  
+- German (de)   
+- Spanish (es)   
+- English (en)   
+- Portuguese (pt)   
+- French (fr)   
+- Korean (ko)   
 
 ---
 
