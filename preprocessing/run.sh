@@ -30,7 +30,7 @@ echo Running preprocessing for Belarussian
 python preprocessing.py -lang be -n 10000
 
 echo Running preprocessing for German
-python preprocessing.py -lang ge -n 10000
+python preprocessing.py -lang de -n 10000
 
 echo Running preprocessing for Italian
 python preprocessing.py -lang it -n 10000
