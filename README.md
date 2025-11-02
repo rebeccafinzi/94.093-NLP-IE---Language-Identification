@@ -87,7 +87,7 @@ chmod +x run.sh
 python preprocessing.py -lang en -n 10000
 ```
 
-### Inspect the Results
+### Potential issues
 
 1. **Data Bias (Sample Size Differences)**  
    - The amount of available data varies significantly across languages due to differences in resource availability.  
