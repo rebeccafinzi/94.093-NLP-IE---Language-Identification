@@ -37,12 +37,54 @@ The preprocessing pipeline was designed to produce a **clean, consistent, and st
 2. **Whitespace normalization** – Multiple consecutive spaces and newlines were replaced with a single space.
 
 3. **Tokenization** – Text was tokenized using **Stanza**, a state-of-the-art NLP library that respects language-specific rules.
- 
-4. **Stopword removal** – Removal of very common words such as "the", "and", "di", "e".
 
-5. **Stemming / Lemmatization** – Reduce tokens to their root or base forms.
+4. **Saving in CoNLL format** – Finally, the cleaned and tokenized text was saved in CoNLL-U format, suitable for NLP model training and evaluation.
 
-6. **Saving in CoNLL format** – Finally, the cleaned and tokenized text was saved in CoNLL-U format, suitable for NLP model training and evaluation.  
+Stopword removal, stemming, and lemmatization are intentionally excluded.  
+These operations can remove morphological or orthographic cues that are crucial for distinguishing languages in language identification tasks.
+
+### Data and Configuration
+
+- Each language is processed using 10,000 Wikipedia pages, chosen as a practical balance between computational cost (RAM, runtime, storage) and representativeness.
+
+- Cleaned text retains only language-appropriate alphabets, digits, and the following punctuation marks:
+```
+PUNCT = r"\.,;:!\?\-\(\)\"'«»“”‘’…¿¡/%"
+```
+
+These punctuation symbols are preserved because their usage frequency and positioning differ across languages, making them valuable discriminative features.
+
+- After processing, all files are saved in:
+```
+preprocessing/data/output_{lang}.conllu
+```
+
+### Structure
+```
+94.093-NLP-IE---Language-Identification/
+└── preprocessing/
+    ├── data/
+    │   ├── output_fr.conllu
+    │   ├── output_ko.conllu
+    │   ├── output_pt.conllu
+    │   └── ...
+    │
+    ├── preprocessing.py
+    ├── requirements.txt
+    └── run.sh
+```
+
+### How to run
+#### Option 1: Run All Languages Sequentially
+```
+chmod +x run.sh
+./run.sh
+```
+#### Option 2: Run a Single Language Manually
+```
+python preprocessing.py -lang en -n 10000
+```
+
    
 
 
