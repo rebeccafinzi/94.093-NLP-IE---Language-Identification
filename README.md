@@ -58,6 +58,8 @@ These punctuation symbols are preserved because their usage frequency and positi
 ```
 preprocessing/data/output_{lang}.conllu
 ```
+However, since GitHub has file size limitations, the resulting .conllu files have been uploaded to Google Drive instead:
+https://drive.google.com/drive/folders/1osun1pC_xVrVZmb-LnneVxrUtf-o_GvR
 
 ### Structure
 ```
