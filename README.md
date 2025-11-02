@@ -87,6 +87,21 @@ chmod +x run.sh
 python preprocessing.py -lang en -n 10000
 ```
 
-   
+### Inspect the Results
+
+1. **Data Bias (Sample Size Differences)**  
+   - The amount of available data varies significantly across languages due to differences in resource availability.  
+   - As a result, some languages (e.g., Tamil, Belarusian) have fewer samples compared to high-resource languages like English or Spanish.  
+   This imbalance must be considered during model training and evaluation to prevent bias.
+
+2. **Tokenization Accuracy**  
+   - The performance of Stanza’s tokenizer differs slightly across languages.  
+   - For morphologically complex languages, tokenization errors may occur more frequently, which can affect downstream model performance.
+   These issues will be reviewed and, if necessary, addressed in later stages.
+
+3. **Language Characters**  
+   - Most of the selected languages use Latin-based scripts, while Russian and Belarusian share the Cyrillic script.  
+   - This overlap may lead to misclassification between linguistically similar languages.
+  
 
 
