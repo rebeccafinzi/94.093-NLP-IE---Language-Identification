@@ -107,5 +107,9 @@ python preprocessing.py -lang en -n 10000
    - Most of the selected languages use Latin-based scripts, while Russian and Belarusian share the Cyrillic script.  
    - This overlap may lead to misclassification between linguistically similar languages.
   
+4. **Large-Scale Data Handling**  
+   - Each preprocessed dataset per language can reach several gigabytes in size.  
+   - Training and storing models on such large files may lead to memory limitations and long processing times, especially on standard hardware.  
+   - Efficient data streaming, chunking, and storage optimizations (e.g., incremental loading, compressed formats, selective preprocessing) may be required to ensure model development.
 
 
