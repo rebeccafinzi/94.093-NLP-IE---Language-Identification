@@ -16,7 +16,7 @@ The objective of this project is to build a **multilingual dataset for automatic
 For this project, we selected **ten languages**, including both well-resourced and under-resourced languages. The chosen languages are:  
 
 - Italian  
-- Malayalam  
+- Tamil  
 - Belarusian  
 - Russian  
 - German  
