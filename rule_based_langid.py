@@ -4,11 +4,11 @@ import random
 from collections import Counter, defaultdict
 from typing import List, Dict, Tuple, Iterable
 
-# ----------------- 0. Языки, с которыми работаем -----------------
-
 LANG_CODES = ["de", "en", "es", "fr", "it", "ko", "pt", "ta", "be", "ru"]
 
-# ----------------- 1. Базовые правила по языкам (ручные) -----------------
+# ---------------------------
+
+# basic language detecting rules
 
 LANG_RULES: Dict[str, Dict] = {
     "en": {
@@ -21,6 +21,7 @@ LANG_RULES: Dict[str, Dict] = {
         "special_chars": set(),
         "bigrams": set(),
         "trigrams": set(),
+        "fourgrams": set(),
     },
     "de": {
         "name": "German",
@@ -32,6 +33,7 @@ LANG_RULES: Dict[str, Dict] = {
         "special_chars": {"ä", "ö", "ü", "ß"},
         "bigrams": set(),
         "trigrams": set(),
+        "fourgrams": set(),
     },
     "es": {
         "name": "Spanish",
@@ -46,6 +48,7 @@ LANG_RULES: Dict[str, Dict] = {
         "special_chars": {"ñ"},
         "bigrams": set(),
         "trigrams": set(),
+        "fourgrams": set(),
     },
     "fr": {
         "name": "French",
@@ -62,6 +65,7 @@ LANG_RULES: Dict[str, Dict] = {
         "special_chars": {"é", "è", "ê", "à", "ç", "ù", "ô"},
         "bigrams": set(),
         "trigrams": set(),
+        "fourgrams": set(),
     },
     "it": {
         "name": "Italian",
@@ -74,6 +78,7 @@ LANG_RULES: Dict[str, Dict] = {
         "special_chars": {"à", "è", "é", "ì", "ò", "ù"},
         "bigrams": set(),
         "trigrams": set(),
+        "fourgrams": set(),
     },
     "pt": {
         "name": "Portuguese",
@@ -87,6 +92,7 @@ LANG_RULES: Dict[str, Dict] = {
         "special_chars": {"ã", "õ"},
         "bigrams": set(),
         "trigrams": set(),
+        "fourgrams": set(),
     },
     "ko": {
         "name": "Korean",
@@ -94,9 +100,10 @@ LANG_RULES: Dict[str, Dict] = {
         "stopwords": {
             "이", "그", "저", "그리고", "하지만", "에서", "에게", "이다"
         },
-        "special_chars": set(),  # сам хангыль уже отличим
+        "special_chars": set(),  # all letters are unique already
         "bigrams": set(),
         "trigrams": set(),
+        "fourgrams": set(),
     },
     "ta": {
         "name": "Tamil",
@@ -104,9 +111,10 @@ LANG_RULES: Dict[str, Dict] = {
         "stopwords": {
             "ஒரு", "இந்த", "அது", "இல்", "மற்றும்", "என்று"
         },
-        "special_chars": set(),
+        "special_chars": set(), # all letters are unique already
         "bigrams": set(),
         "trigrams": set(),
+        "fourgrams": set(),
     },
     "ru": {
         "name": "Russian",
@@ -119,6 +127,7 @@ LANG_RULES: Dict[str, Dict] = {
         "special_chars": {"ъ", "ы", "э"},
         "bigrams": set(),
         "trigrams": set(),
+        "fourgrams": set(),
     },
     "be": {
         "name": "Belarusian",
@@ -126,15 +135,18 @@ LANG_RULES: Dict[str, Dict] = {
         "stopwords": {
             "і", "што", "ён", "яна", 
             "як", "з", "па", "гэта", "калі", "каб", "яшчэ", "таму",
-            "ён", "яны", "які", "якая", "якое", "якія", "нібыта"
+            "яны", "які", "якая", "якое", "якія", "нібыта"
         },
         "special_chars": {"ў", "і"},
         "bigrams": set(),
         "trigrams": set(),
+        "fourgrams": set(),
     },
 }
 
-# ----------------- 2. Скрипт текста -----------------
+# ----------------------------
+
+# text script
 
 def detect_script(text: str) -> str:
     has_cyr = False
@@ -155,7 +167,6 @@ def detect_script(text: str) -> str:
         elif "TAMIL" in name:
             has_tamil = True
 
-    # приоритет: если явно один скрипт
     flags = [has_cyr, has_lat, has_hangul, has_tamil]
     if sum(flags) == 1:
         if has_cyr:
@@ -170,45 +181,82 @@ def detect_script(text: str) -> str:
     return "mixed"
 
 
-# ----------------- 3. Токенизация и n-граммы -----------------
+# -------------------------
 
+# tokenizing to letters (to check the unique letters for language)
 WORD_RE = re.compile(r"[^\W\d_]+", re.UNICODE)
 
 def tokenize(text: str) -> List[str]:
     return [w.lower() for w in WORD_RE.findall(text)]
 
-
+# making n-grams
 def char_ngrams(text: str, n: int) -> Counter:
     text = text.lower()
     chars = [c for c in text if c.isalpha()]
     grams = ["".join(chars[i:i + n]) for i in range(len(chars) - n + 1)]
     return Counter(grams)
 
+# -----------------------
 
-# ----------------- 4. Чтение .conllu -----------------
+def clean_text_basic(text: str) -> str:
+    # оставляем только буквы любых алфавитов и пробелы
+    cleaned_chars = []
+    for ch in text:
+        if ch.isalpha() or ch.isspace():
+            cleaned_chars.append(ch)
+        else:
+            cleaned_chars.append(" ")
+    text = "".join(cleaned_chars)
+    # сжимаем пробелы
+    text = re.sub(r"\s+", " ", text)
+    return text.strip()
+
+# -----------------------
+
+# reading a single conllu file
+# collecting data from tokens (FORM), empty row - ende of sentence
+# making another cleaning (just in case), putting them back into sentences
 
 def load_conllu_sentences(path: str) -> List[str]:
-    """
-    Вытаскиваем все строки '# text = ...' как отдельные предложения.
-    """
     sentences = []
+    current_tokens: list[str] = []
+
     with open(path, "r", encoding="utf-8") as f:
         for line in f:
-            if line.startswith("# text ="):
-                sent = line[len("# text ="):].strip()
-                if sent:
-                    sentences.append(sent)
+            line = line.rstrip("\n")
+
+            if not line:
+                if current_tokens:
+                    sent = " ".join(current_tokens)
+                    sent = clean_text_basic(sent)
+                    if sent:
+                        sentences.append(sent)
+                    current_tokens = []
+                continue
+
+            if line.startswith("#"):
+                continue
+
+            cols = line.split("\t")
+            if len(cols) >= 2:
+                token = cols[1]
+                current_tokens.append(token)
+
+    if current_tokens:
+        sent = " ".join(current_tokens)
+        sent = clean_text_basic(sent)
+        if sent:
+            sentences.append(sent)
+
     return sentences
 
-
-def load_corpus_from_dir(data_dir: str,
-                         max_sent_per_lang: int = 50000) -> Tuple[List[str], List[str]]:
-    """
-    Читает все output_XX.conllu из data_dir.
-    Возвращает:
-        texts: список предложений
-        labels: соответствующие языковые коды
-    """
+# reads all output_lang.conllu from data folder, taking 50000 for one language as the best option
+# texts - list of cleaned sentences, labels - list of language codes
+# try except in case file is not found
+def load_corpus_from_dir(
+    data_dir: str,
+    max_sent_per_lang: int = 100000
+) -> Tuple[List[str], List[str]]:
     texts, labels = [], []
     for lang in LANG_CODES:
         path = f"{data_dir}/output_{lang}.conllu"
@@ -223,7 +271,9 @@ def load_corpus_from_dir(data_dir: str,
 
         texts.extend(sents)
         labels.extend([lang] * len(sents))
+
     return texts, labels
+
 
 
 # ----------------- 5. Построение n-грамм на корпусе -----------------
@@ -253,6 +303,7 @@ def init_ngram_rules(
     labels: Iterable[str],
     bigram_top_k: int = 30,
     trigram_top_k: int = 30,
+    fourgram_top_k: int = 30,
 ) -> None:
     """
     «Обучаем» биграммы и триграммы из train-корпуса и
@@ -260,12 +311,15 @@ def init_ngram_rules(
     """
     bigrams = build_char_ngrams_from_corpus(texts, labels, n=2, top_k=bigram_top_k)
     trigrams = build_char_ngrams_from_corpus(texts, labels, n=3, top_k=trigram_top_k)
+    fourgrams = build_char_ngrams_from_corpus(texts, labels, n=4, top_k=fourgram_top_k)
 
     for lang, rules in LANG_RULES.items():
         if lang in bigrams:
             rules["bigrams"] = set(bigrams[lang])
         if lang in trigrams:
             rules["trigrams"] = set(trigrams[lang])
+        if lang in fourgrams:
+            rules["fourgrams"] = set(fourgrams[lang])
 
 
 # ----------------- 6. Scoring для одного языка -----------------
@@ -275,28 +329,33 @@ def score_language(text: str, lang_code: str) -> float:
     tokens = tokenize(text)
     bigram_counts = char_ngrams(text, 2)
     trigram_counts = char_ngrams(text, 3)
+    fourgram_counts = char_ngrams(text, 4)
 
     score = 0.0
 
-    # стоп-слова
+    # stop words
     sw = rules.get("stopwords", set())
     for tok in tokens:
         if tok in sw:
-            score += 1.5
+            score += 3
 
-    # спец-символы
+    # special symbols
     specials = rules.get("special_chars", set())
     for ch in text.lower():
         if ch in specials:
             score += 4.0
 
-    # биграммы
+    # 2-grams
     for gram in rules.get("bigrams", set()):
         score += 1.0 * bigram_counts.get(gram, 0)
 
-    # триграммы
+    # 3-grams
     for gram in rules.get("trigrams", set()):
         score += 2.0 * trigram_counts.get(gram, 0)
+
+    # 4-grams
+    for gram in rules.get("fourgrams", set()):
+        score += 3.0 * fourgram_counts.get(gram, 0)
 
     return score
 
@@ -315,6 +374,9 @@ def predict_language(text: str) -> str:
 
     if not candidates:
         candidates = list(LANG_RULES.keys())
+
+    if len(candidates) == 1:
+        return candidates[0]
 
     scores = {code: score_language(text, code) for code in candidates}
     best_lang, best_score = max(scores.items(), key=lambda x: x[1])
@@ -375,6 +437,7 @@ def debug_scores(text: str):
 
     bigram_counts = char_ngrams(text, 2)
     trigram_counts = char_ngrams(text, 3)
+    fourgram_counts = char_ngrams(text, 4)
 
     for lang, rules in LANG_RULES.items():
         s = score_language(text, lang)
@@ -387,35 +450,46 @@ def debug_scores(text: str):
               [g for g in rules["bigrams"] if bigram_counts.get(g, 0) > 0][:20])
         print("  trigrams:",
               [g for g in rules["trigrams"] if trigram_counts.get(g, 0) > 0][:20])
+        print("  fourgrams:",
+              [g for g in rules["fourgrams"] if fourgram_counts.get(g, 0) > 0][:20])
 
 if __name__ == "__main__":
-    DATA_DIR = "preprocessing/data"  # папка, где лежат output_*.conllu
+    DATA_DIR = "preprocessing/data"
 
     # 1) грузим все предложения из conllu
-    texts, labels = load_corpus_from_dir(DATA_DIR, max_sent_per_lang=50000)
+    texts, labels = load_corpus_from_dir(DATA_DIR, max_sent_per_lang=100000)
     print(f"Total sentences: {len(texts)}")
 
     # 2) делим на train/test
-    train_texts, train_labels, test_texts, test_labels = train_test_split(texts, labels, test_ratio=0.2)
+    train_texts, train_labels, test_texts, test_labels = train_test_split(
+        texts, labels, test_ratio=0.2
+    )
 
     # 3) обучаем n-граммные правила на train
-    init_ngram_rules(train_texts, train_labels, bigram_top_k=30, trigram_top_k=30)
+    init_ngram_rules(
+        train_texts,
+        train_labels,
+        bigram_top_k=30,
+        trigram_top_k=30,
+        fourgram_top_k=30,
+    )
 
-    debug_scores("я зрабіў прыкладны беларускі сказ")
+    # 4) печатаем n-граммы для КАЖДОГО языка
+    print("\nSample n-grams per language:")
+    for lang in ["de", "en", "es", "fr", "it", "ko", "pt", "ta", "be", "ru"]:
+        rules = LANG_RULES[lang]
+        print(f"\n{lang} bigrams:   {sorted(rules['bigrams'])[:20]}")
+        print(f"{lang} trigrams:  {sorted(rules['trigrams'])[:20]}")
+        print(f"{lang} fourgrams: {sorted(rules['fourgrams'])[:20]}")
 
-    print("\nSample bigrams/trigrams per language:")
-for lang in ["en", "de", "fr", "es", "ru", "be"]:
-    rules = LANG_RULES[lang]
-    print(f"\n{lang} bigrams:", list(sorted(rules["bigrams"]))[:20])
-    print(f"{lang} trigrams:", list(sorted(rules["trigrams"]))[:20])
-
-    # 4) оцениваем на test
+    # 5) ОДИН раз считаем точность
     acc, conf = evaluate(test_texts, test_labels)
-    print(f"Rule-based accuracy: {acc:.4f}")
+    print(f"\nRule-based accuracy: {acc:.4f}")
     print("Some confusions:")
     for (gold, pred), cnt in conf.most_common(20):
         print(f"{gold} -> {pred}: {cnt}")
 
-    # 5) маленькая демо-проверка на руками заданных примерах
+    # 6) демо-примеры
     print("\nDemo examples:")
     demo_example()
+
