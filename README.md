@@ -78,6 +78,11 @@ https://drive.google.com/drive/folders/1osun1pC_xVrVZmb-LnneVxrUtf-o_GvR
     ├── preprocessing.py
     ├── requirements.txt
     └── run.sh
+    ├── rule_based_langid.py
+    ├── rule_based_langid_param.ipynb
+    ├── baseline_submission_ml.py
+    ├── baseline_submission_ml.ipynb
+    └── README.md
 ```
 
 ### How to run
@@ -110,9 +115,13 @@ python preprocessing.py -lang en -n 10000
    - Training and storing models on such large files may lead to memory limitations and long processing times, especially on standard hardware.  
    - Efficient data streaming, chunking, and storage optimizations (e.g., incremental loading, compressed formats, selective preprocessing) may be required to ensure model development.
 
+---
+
 ## Milestone 2 – Mulitple Baseline Solutions
 
 The mulitple baseline solutions include using both machine learning models and rule based models. It is then evaluated both quantitatively and qualitatively. 
+
+---
 
 ### Rule-based model
 
@@ -167,8 +176,6 @@ These features help disambiguate languages that share scripts or similar vocabul
 - The language with the highest score is predicted.  
 - If all scores equal zero the result is `unknown`.
 
----
-
 #### Hyperparameter Search
 
 Due to data volume restrictions and noticing, that more data doesn't mean better results, samples of different sizes for each language were tried.  
@@ -198,8 +205,6 @@ A large-scale evaluation tested combinations of:
 
 Total: 27 configurations.
 
----
-
 #### Results
 
 The rule-based model was evaluated using **overall accuracy**, computed as the ratio of correctly predicted sentences to the total number of sentences in the test set.  
@@ -220,8 +225,6 @@ Other metrics (precision, recall, F1) are less informative here, since the rule-
 Accuracy converges near 93–94%.  
 Increasing max_sent beyond 50k or top_k beyond 40 does not meaningfully improve performance.
 
----
-
 #### Final Chosen Configuration
 
 - **max_sent_per_lang = 50,000**  
@@ -231,9 +234,7 @@ Increasing max_sent beyond 50k or top_k beyond 40 does not meaningfully improve 
 
 This is the most stable configuration with the best balance of accuracy and runtime ratio.
 
----
-
-#### Top Confusions
+#### Confusions
 
 | gold → predicted | count |
 |------------------|-------|
@@ -256,7 +257,9 @@ Most errors reflect real linguistic similarity:
 - Belarusian and Russian (shared Cyrillic script and same words)
 - Romance languages (es, pt, it, fr)
 - Occasional errors from lexical borrowing
-  
+
+---
+
 ### Machine learning model
 
 1. **Data Ingestion** - parsing text from custom CoNLL-U files
