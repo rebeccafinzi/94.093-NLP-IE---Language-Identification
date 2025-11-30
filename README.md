@@ -231,7 +231,7 @@ Other metrics (precision, recall, F1) are less informative here, since the rule-
 **Accuracy across configurations:**
 
 |max_sent_per_lang | top_k | weights         | accuracy | 
-|-------------------------------------------------------|
+|------------------|-------|----------------------------|
 |50000             | 40    | base            | 0.939160 | 
 |150000            | 40    | base            | 0.937730 | 
 |100000            | 40    | base            | 0.937525 | 
