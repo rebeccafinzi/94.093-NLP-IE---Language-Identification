@@ -121,20 +121,21 @@ The mulitple baseline solutions include using both machine learning models and r
 ```
 94.093-NLP-IE---Language-Identification/
 └── preprocessing/
-    ├── data/
-    │   ├── output_fr.conllu
-    │   ├── output_ko.conllu
-    │   ├── output_pt.conllu
-    │   └── ...
-    │
-    ├── preprocessing.py
-    ├── requirements.txt
-    └── run.sh
-    ├── rule_based_langid.py - final rule-based model
-    ├── rule_based_langid_param.ipynb - rule-based model process of parameters choosing with all the results printed
-    ├── baseline_submission_ml.py - final ML-based model
-    ├── baseline_submission_ml.ipynb - final ML-based model with all the results printed
-    └── README.md
+│   ├── data/
+│   │   ├── output_fr.conllu
+│   │   ├── output_ko.conllu
+│   │   ├── output_pt.conllu
+│   │   └── ...
+│   │
+│   ├── preprocessing.py
+│   ├── requirements.txt
+│   └── run.sh
+│
+├── rule_based_langid.py - final rule-based model
+├── rule_based_langid_param.ipynb - rule-based model process of parameters choosing with all the results printed
+├── baseline_submission_ml.py - final ML-based model
+├── baseline_submission_ml.ipynb - final ML-based model with all the results printed
+└── README.md
 ```
 
 ---
