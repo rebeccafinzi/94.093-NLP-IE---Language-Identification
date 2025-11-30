@@ -196,7 +196,7 @@ These features help disambiguate languages that share scripts or similar vocabul
 #### Hyperparameter Search
 
 Due to data volume restrictions and noticing, that more data doesn't mean better results, samples of different sizes for each language were tried.  
-Other parameters were the number of top n-grams and scoring scemes.
+Other parameters were the number of top n-grams and scoring schemes.
 
 The following weight configurations were used during the experiments:
 
