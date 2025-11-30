@@ -114,6 +114,149 @@ python preprocessing.py -lang en -n 10000
 
 The mulitple baseline solutions include using both machine learning models and rule based models. It is then evaluated both quantitatively and qualitatively. 
 
+### Rule-based model
+
+The rule-based system for language identification was built on script detection, stopwords, character-level n-grams (bi-, tri-, four-grams), and language-specific special characters.  
+The method does not require model training in the classical sense. Instead, it extracts statistical frequency patterns from the multilingual corpus and stores them inside rule sets for each language.  
+The language is chosen either by alphabet (if it's unique in the language group) or by scoring.  
+
+#### Methodology
+
+**1. Script Detection**  
+Each input text is inspected for alphabet family:  
+- Latin (en, de, fr, es, it, pt)  
+- Cyrillic (ru, be)  
+- Hangul (ko)  
+- Tamil (ta)  
+
+If only one script is present, classification is restricted to languages using that script.  
+If multiple scripts are mixed, all languages are considered.
+
+This step significantly reduces false positives.
+
+**2. Character-level N-grams**  
+For every language, the system extracts the top *K* most frequent:
+- bigrams
+- trigrams
+- four-grams
+
+These n-grams capture stable orthographic patterns unique to each language.
+
+Weights applied during scoring:  
+
+| Feature | Weight |
+|--------|--------|
+| bigram | +1 |
+| trigram | +2 |
+| four-gram | +3 |
+
+**3. Stopwords & Special Characters**
+
+The list of stopwords (unique but quite freaquent words for the language) and special characters was made manually based on the information on the internet.
+
+| Feature | Weight |
+|---------|--------|
+| stopword | +3 |
+| language-specific characters | +4 |
+
+These features help disambiguate languages that share scripts or similar vocabulary.
+
+**4. Language Prediction**  
+- If script filtering results in exactly one candidate language - it is returned immediately.  
+- Otherwise all candidates receive a rule-based score.  
+- The language with the highest score is predicted.  
+- If all scores equal zero the result is `unknown`.
+
+---
+
+#### Hyperparameter Search
+
+Due to data volume restrictions and noticing, that more data doesn't mean better results, samples of different sizes for each language were tried.  
+Other parameters were the number of top n-grams and scoring scemes.
+
+The following weight configurations were used during the experiments:
+
+| Feature                 | `base` | `strong_ngrams` | `strong_special` |
+|------------------------|:------:|:---------------:|:----------------:|
+| stopwords              |   3.0  |       2.0       |       2.0        |
+| language-specific char |   4.0  |       3.0       |       6.0        |
+| bigram match           |   1.0  |       1.5       |       1.0        |
+| trigram match          |   2.0  |       3.0       |       2.0        |
+| four-gram match        |   3.0  |       4.0       |       3.0        |
+
+`base` is the balanced configuration used in the final rule-based model.  
+`strong_ngrams` increases the contribution of all n-grams.  
+`strong_special` heavily increases the influence of language-specific characters.
+
+A large-scale evaluation tested combinations of:
+
+| Parameter | Tested Values |
+|----------|----------------|
+| max_sent_per_lang | 50k, 80k, 100k |
+| n-gram top_k | 20, 30, 40 |
+| scoring schemes | base, strong_ngrams, strong_special |
+
+Total: 27 configurations.
+
+---
+
+#### Results
+
+The rule-based model was evaluated using **overall accuracy**, computed as the ratio of correctly predicted sentences to the total number of sentences in the test set.  
+Accuracy was chosen as the final evaluation metric because the task is a single-label, closed-set classification problem with balanced class distribution after sampling.  
+Other metrics (precision, recall, F1) are less informative here, since the rule-based system does not output probabilistic predictions and cannot be tuned per class.
+
+**Accuracy across configurations:**
+
+| max_sent | top_k | weights | accuracy |
+|---------:|------:|---------|---------:|
+| 50000 | 40 | base | **0.9392** |
+| 80000 | 40 | base | 0.9381 |
+| 100000 | 40 | base | 0.9375 |
+| 50000 | 30 | base | 0.9342 |
+| 80000 | 30 | base | 0.9308 |
+| 100000 | 30 | base | 0.9302 |
+
+Accuracy converges near 93–94%.  
+Increasing max_sent beyond 50k or top_k beyond 40 does not meaningfully improve performance.
+
+---
+
+#### Final Chosen Configuration
+
+- **max_sent_per_lang = 50,000**  
+- **top_k_n_grams = 40**  
+- **weights = base**  
+- **accuracy = 0.9392**
+
+This is the most stable configuration with the best balance of accuracy and runtime ratio.
+
+---
+
+#### Top Confusions
+
+| gold → predicted | count |
+|------------------|-------|
+| be → ru | 809 |
+| es → pt | 725 |
+| es → en | 339 |
+| de → en | 337 |
+| pt → fr | 297 |
+| pt → es | 276 |
+| es → it | 249 |
+| pt → en | 214 |
+| es → fr | 200 |
+| ru → be | 162 |
+| fr → en | 155 |
+| it → es | 154 |
+| it → en | 152 |
+| es → de | 151 |
+
+Most errors reflect real linguistic similarity:
+- Belarusian and Russian (shared Cyrillic script and same words)
+- Romance languages (es, pt, it, fr)
+- Occasional errors from lexical borrowing
+  
 ### Machine learning model
 
 1. **Data Ingestion** - parsing text from custom CoNLL-U files
