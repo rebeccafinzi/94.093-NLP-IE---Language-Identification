@@ -126,7 +126,7 @@ The mulitple baseline solutions include using both machine learning models and r
 ### Rule-based model
 
 The rule-based system for language identification was built on script detection, stopwords, character-level n-grams (bi-, tri-, four-grams), and language-specific special characters.  
-The method does not require model training in the classical sense. Instead, it extracts statistical frequency patterns from the multilingual corpus and stores them inside rule sets for each language.  
+The method does not require ML model training. Instead, it extracts statistical frequency patterns from the multilingual corpus and stores them inside rule sets for each language.  
 The language is chosen either by alphabet (if it's unique in the language group) or by scoring.  
 
 #### Methodology
@@ -199,11 +199,11 @@ A large-scale evaluation tested combinations of:
 
 | Parameter | Tested Values |
 |----------|----------------|
-| max_sent_per_lang | 50k, 80k, 100k |
+| max_sent_per_lang | 50k, 100k, 150k, 200k |
 | n-gram top_k | 20, 30, 40 |
 | scoring schemes | base, strong_ngrams, strong_special |
 
-Total: 27 configurations.
+Total: 36 configurations.
 
 #### Results
 
@@ -213,17 +213,47 @@ Other metrics (precision, recall, F1) are less informative here, since the rule-
 
 **Accuracy across configurations:**
 
-| max_sent | top_k | weights | accuracy |
-|---------:|------:|---------|---------:|
-| 50000 | 40 | base | **0.9392** |
-| 80000 | 40 | base | 0.9381 |
-| 100000 | 40 | base | 0.9375 |
-| 50000 | 30 | base | 0.9342 |
-| 80000 | 30 | base | 0.9308 |
-| 100000 | 30 | base | 0.9302 |
+max_sent_per_lang | top_k | weights         | accuracy | 
+--------------------------------------------------------
+50000             | 40    | base            | 0.939160 | 
+150000            | 40    | base            | 0.937730 | 
+100000            | 40    | base            | 0.937525 | 
+50000             | 40    | strong_ngrams   | 0.935700 |
+50000             | 40    | strong_special  | 0.934950 |
+100000            | 40    | strong_ngrams   | 0.934245 |
+50000             | 30    | base            | 0.934190 |
+150000            | 40    | strong_ngrams   | 0.934173 |
+150000            | 40    | strong_special  | 0.933093 |
+100000            | 40    | strong_special  | 0.932765 |
+200000            | 40    | base            | 0.932250 |
+150000            | 30    | base            | 0.931037 |
+50000             | 30    | strong_ngrams   | 0.930690 |
+100000            | 30    | base            | 0.930215 |
+50000             | 30    | strong_special  | 0.929510 |
+200000            | 40    | strong_ngrams   | 0.928747 |
+200000            | 40    | strong_special  | 0.927662 |
+200000            | 30    | base            | 0.927325 |
+150000            | 30    | strong_ngrams   | 0.926940 |
+50000             | 20    | base            | 0.926760 |
+100000            | 30    | strong_ngrams   | 0.926665 |
+150000            | 30    | strong_special  | 0.926077 |
+100000            | 30    | strong_special  | 0.924830 |
+200000            | 30    | strong_ngrams   | 0.923273 |
+200000            | 30    | strong_special  | 0.922095 |
+150000            | 20    | base            | 0.921300 |
+100000            | 20    | base            | 0.921245 |
+50000             | 20    | strong_ngrams   | 0.921190 |
+50000             | 20    | strong_special  | 0.921070 |
+100000            | 20    | strong_ngrams   | 0.916715 |
+200000            | 20    | base            | 0.916510 |
+150000            | 20    | strong_ngrams   | 0.916057 |
+100000            | 20    | strong_special  | 0.914860 |
+150000            | 20    | strong_special  | 0.914443 |
+200000            | 20    | strong_ngrams   | 0.911680 |
+200000            | 20    | strong_special  | 0.910743 |
 
-Accuracy converges near 93–94%.  
-Increasing max_sent beyond 50k or top_k beyond 40 does not meaningfully improve performance.
+Accuracy converges near 91–94%.  
+Increasing max_sent beyond 50k or top_k beyond 40 does not improve performance.
 
 #### Final Chosen Configuration
 
