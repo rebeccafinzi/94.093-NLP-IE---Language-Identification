@@ -129,13 +129,13 @@ The mulitple baseline solutions include using both machine learning models and r
 #### Methodology
 
 1. **Data Processing**
-Text data is extracted from CoNLL-U formatted files (specifically targeting the `# text = ` field) located in the `data/` directory. A total of **6,669,377 sentences** were loaded and used for training and testing. The dataset was split into training and testing sets with an **80/20 ratio**, using **stratified sampling** to ensure the proportion of each language is maintained in both sets.
+   - Text data is extracted from CoNLL-U formatted files (specifically targeting the `# text = ` field) located in the `data/` directory. A total of **6,669,377 sentences**      were loaded and used for training and testing. The dataset was split into training and testing sets with an **80/20 ratio**, using **stratified sampling** to ensure         the proportion of each language is maintained in both sets.
 
 2. **Feature Engineering**
-**TF-IDF (Term Frequency-Inverse Document Frequency)** was used to weigh the importance of words (unigrams) in the corpus. The vectorizer was limited to the **top 1,000 most frequent features** to maintain efficiency and generalization across a large, multilingual vocabulary.
+   - **TF-IDF (Term Frequency-Inverse Document Frequency)** was used to weigh the importance of words (unigrams) in the corpus. The vectorizer was limited to the **top           1,000 most frequent features** to maintain efficiency and generalization across a large, multilingual vocabulary.
 
 3. **Model Selection**
-**Multinomial Naive Bayes (MNB)** was chosen. MNB is a well-suited baseline for text classification tasks, particularly when using count or TF-IDF features, due to its simplicity, speed, and strong performance.
+   - **Naive Bayes** was chosen. MNB is a well-suited baseline for text classification tasks, particularly when using count or TF-IDF features, due to its simplicity,            speed, and strong performance.
 
 #### Performance
 | Metric | Value |
