@@ -104,7 +104,56 @@ python preprocessing.py -lang en -n 10000
 3. **Language Characters**  
    - Most of the selected languages use Latin-based scripts, while Russian and Belarusian share the Cyrillic script.  
    - This overlap may lead to misclassification between linguistically similar languages.
+
   
+## Milestone 2 – Mulitple Baseline Solutions
+
+The mulitple baseline solutions include using both machine learning models and rule based models. It is then evaluated both quantitatively and qualitatively. 
+
+### Machine learning model
+
+1. **Data Ingestion** - parsing text from custom CoNLL-U files
+
+2. **Feature Engineering:** - Converting raw text into numerical features using TF-IDF
+
+3. **Model Training:** - Training a Multinomial Naive Bayes classifier
+
+4. **Evaluation:** - Assessing performance using standard metrics
+
+#### Methodology
+
+1. **Data Processing**
+   - Text data is extracted from CoNLL-U formatted files (specifically targeting the `# text = ` field) located in the `data/` directory. A total of **6,669,377 sentences**      were loaded and used for training and testing. The dataset was split into training and testing sets with an **80/20 ratio**, using **stratified sampling** to ensure         the proportion of each language is maintained in both sets.
+
+2. **Feature Engineering**
+   - **TF-IDF (Term Frequency-Inverse Document Frequency)** was used to weigh the importance of words (unigrams) in the corpus. The vectorizer was limited to the **top           1,000 most frequent features** to maintain efficiency and generalization across a large, multilingual vocabulary.
+
+3. **Model Selection**
+   - **Naive Bayes** was chosen. MNB is a well-suited baseline for text classification tasks, particularly when using count or TF-IDF features, due to its simplicity,            speed, and strong performance.
+
+#### Performance
+| Metric | Value |
+| :--- | :--- |
+| **Test Set Size** | 1,333,876 |
+| **Model Accuracy** | **0.8727 (87.27%)** |
+
+The model was evaluated on the 20% test set, comprising **1,333,876 sentences**. The model shows excellent performance across most Latin-script languages (e.g., German, English, Spanish) but reveals specific challenges with languages that have lower training sample counts or share significant vocabulary with other languages.
+
+| Language | Precision | Recall | F1-Score | Support | Notes |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **ta** (Tamil) | 1.00 | 0.99 | 1.00 | 44,321 | Near-perfect performance. |
+| **de** (German) | 0.98 | 0.95 | 0.96 | 133,047 | Very strong performance. |
+| **it** (Italian) | 0.99 | 0.94 | 0.96 | 67,156 | Excellent discrimination. |
+| **en** (English) | 0.95 | 0.97 | 0.96 | 123,567 | High recall and precision. |
+| **es** (Spanish) | 0.92 | 0.94 | 0.93 | 202,086 | Strong, reliable performance. |
+| **fr** (French) | 0.98 | 0.88 | 0.93 | 133,289 | High precision, but some false negatives (lower recall). |
+| **pt** (Portuguese) | 0.99 | 0.83 | 0.90 | 145,715 | High precision, but lower recall suggests confusion with related languages (e.g., Spanish, French). |
+| **ru** (Russian) | 0.72 | 1.00 | 0.83 | 351,998 | **High Recall (1.00):** Captures almost all Russian sentences, but **low Precision (0.72)** indicates it frequently misclassifies other languages as Russian (false positives). |
+| **be** (Belarusian) | 0.92 | 0.25 | 0.39 | 51,368 | **Low Recall:** Suggests high confusion with Russian due to shared Cyrillic script and potentially low sample diversity. |
+| **ko** (Korean) | 0.99 | 0.24 | 0.39 | 81,329 | **Low Recall:** Indicates many Korean sentences are misclassified, despite a unique script. Potential issues with feature representation or sparsity. |
+
+#### Training with SVC model 
+SVC was attempted for comparison, but encountered severe scalability limitations. Training the SVC model on the full 5.3 million sample set proved infeasible. The process was terminated after running for over 48 hours without completion, confirming that SVC is not a practical choice for this scale of data without significant infrastructure optimization. While training the model with limited samples (100 samples), it provided an accuracy of ~60%. 
 4. **Large-Scale Data Handling**  
    - Each preprocessed dataset per language can reach several gigabytes in size.  
    - Training and storing models on such large files may lead to memory limitations and long processing times, especially on standard hardware.  
