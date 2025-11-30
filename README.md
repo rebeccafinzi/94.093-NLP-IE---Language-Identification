@@ -158,4 +158,5 @@ The model was evaluated on the 20% test set, comprising **1,333,876 sentences**.
 | **be** (Belarusian) | 0.92 | 0.25 | 0.39 | 51,368 | **Low Recall:** Suggests high confusion with Russian due to shared Cyrillic script and potentially low sample diversity. |
 | **ko** (Korean) | 0.99 | 0.24 | 0.39 | 81,329 | **Low Recall:** Indicates many Korean sentences are misclassified, despite a unique script. Potential issues with feature representation or sparsity. |
 
-
+#### Training with SVC model 
+SVC was attempted for comparison, but encountered severe scalability limitations. Training the SVC model on the full 5.3 million sample set proved infeasible. The process was terminated after running for over 48 hours without completion, confirming that SVC is not a practical choice for this scale of data without significant infrastructure optimization. While training the model with limited samples (100 samples), it provided an accuracy of ~60%. 
