@@ -105,7 +105,11 @@ python preprocessing.py -lang en -n 10000
    - Most of the selected languages use Latin-based scripts, while Russian and Belarusian share the Cyrillic script.  
    - This overlap may lead to misclassification between linguistically similar languages.
 
-  
+4. **Large-Scale Data Handling**  
+   - Each preprocessed dataset per language can reach several gigabytes in size.  
+   - Training and storing models on such large files may lead to memory limitations and long processing times, especially on standard hardware.  
+   - Efficient data streaming, chunking, and storage optimizations (e.g., incremental loading, compressed formats, selective preprocessing) may be required to ensure model development.
+
 ## Milestone 2 – Mulitple Baseline Solutions
 
 The mulitple baseline solutions include using both machine learning models and rule based models. It is then evaluated both quantitatively and qualitatively. 
@@ -154,9 +158,3 @@ The model was evaluated on the 20% test set, comprising **1,333,876 sentences**.
 
 #### Training with SVC model 
 SVC was attempted for comparison, but encountered severe scalability limitations. Training the SVC model on the full 5.3 million sample set proved infeasible. The process was terminated after running for over 48 hours without completion, confirming that SVC is not a practical choice for this scale of data without significant infrastructure optimization. While training the model with limited samples (100 samples), it provided an accuracy of ~60%. 
-4. **Large-Scale Data Handling**  
-   - Each preprocessed dataset per language can reach several gigabytes in size.  
-   - Training and storing models on such large files may lead to memory limitations and long processing times, especially on standard hardware.  
-   - Efficient data streaming, chunking, and storage optimizations (e.g., incremental loading, compressed formats, selective preprocessing) may be required to ensure model development.
-
-
