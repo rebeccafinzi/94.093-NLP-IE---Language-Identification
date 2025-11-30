@@ -104,10 +104,27 @@ python preprocessing.py -lang en -n 10000
 3. **Language Characters**  
    - Most of the selected languages use Latin-based scripts, while Russian and Belarusian share the Cyrillic script.  
    - This overlap may lead to misclassification between linguistically similar languages.
-  
+
+
 4. **Large-Scale Data Handling**  
    - Each preprocessed dataset per language can reach several gigabytes in size.  
    - Training and storing models on such large files may lead to memory limitations and long processing times, especially on standard hardware.  
    - Efficient data streaming, chunking, and storage optimizations (e.g., incremental loading, compressed formats, selective preprocessing) may be required to ensure model development.
+
+
+## Milestone 1 – Mulitple Baseline Solutions
+
+The mulitple baseline solutions include using both machine learning models and rule based models. It is then evaluated both quantitatively and qualitatively. 
+
+### Machine learning model
+
+1. **Data Ingestion** - arsing text from custom CoNLL-U files
+
+2. **Feature Engineering:** - Converting raw text into numerical features using TF-IDF
+
+3. **Model Training:** - Training a Multinomial Naive Bayes classifier
+
+4. **Evaluation:** - Assessing performance using standard metrics
+
 
 
