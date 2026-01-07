@@ -68,17 +68,42 @@ https://drive.google.com/drive/folders/1osun1pC_xVrVZmb-LnneVxrUtf-o_GvR
 ### Structure
 ```
 94.093-NLP-IE---Language-Identification/
-└── preprocessing/
-    ├── data/
-    │   ├── output_fr.conllu
-    │   ├── output_ko.conllu
-    │   ├── output_pt.conllu
-    │   └── ...
-    │
-    ├── preprocessing.py
-    ├── requirements.txt
-    └── run.sh
-    └── README.md
+├── data/
+│   ├── tweets_dataset.csv
+│   └── stopwords/
+│       ├── be.txt
+│       ├── de.txt
+│       ├── en.txt
+│       └── ...
+│
+├── preprocessing/
+│   ├── data/
+│   │   ├── output_fr.conllu
+│   │   ├── output_ko.conllu
+│   │   ├── output_pt.conllu
+│   │   └── ...
+│   │
+│   ├── preprocessing.py
+│   ├── requirements.txt
+│   ├── run.sh
+│   └── README.md
+│
+├── baseline_submission_ml.py
+├── baseline_submission_ml.ipynb
+├── rule_based_langid.py
+├── rule_based_langid_param.ipynb
+│
+├── final_model/
+│   ├── __init__.py
+│   ├── configuration.py
+│   ├── load_data.py
+│   ├── rulebased.py
+│   ├── finetuned_xlmroberta.py
+│   └── main.py
+│ 
+├── model_evaluation.ipynb
+└── README.md
+
 ```
 
 ### How to run
