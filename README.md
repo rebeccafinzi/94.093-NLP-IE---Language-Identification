@@ -33,40 +33,39 @@ For this project, we selected **ten languages**, including both well-resourced a
 ## Structure
 ```
 94.093-NLP-IE---Language-Identification/
-├── data/
-│   ├── tweets_dataset.csv
-│   └── stopwords/
+├── data/            
+│   ├── tweets_dataset.csv              # twitter dataset for out-of-distribution evaluation
+│   └── stopwords/                      # stopwords for each language
 │       ├── be.txt
 │       ├── de.txt
 │       ├── en.txt
 │       └── ...
-│
+│                                       # ======= Milestone 1 =======  
 ├── preprocessing/
-│   ├── data/
+│   ├── data/                           # preprocessed data for each language in CoNLL-U format
 │   │   ├── output_fr.conllu
 │   │   ├── output_ko.conllu
 │   │   ├── output_pt.conllu
 │   │   └── ...
 │   │
-│   ├── preprocessing.py
-│   ├── requirements.txt
-│   ├── run.sh
-│   └── README.md
+│   ├── preprocessing.py                # text cleaning and tokenization pipeline
+│   ├── requirements.txt                # requirements for preprocessing
+│   └──  run.sh                         # shell script to run preprocessing
+│                                       # ======= Milestone 2 =======  
+├── rule_based_langid.py                # final rule-based model
+├── rule_based_langid_param.ipynb       # rule-based model process of parameters choosing with all the results printed
+├── baseline_submission_ml.py           # final ML-based model
+├── baseline_submission_ml.ipynb        # final ML-based model with all the results printed
 │
-├── baseline_submission_ml.py
-├── baseline_submission_ml.ipynb
-├── rule_based_langid.py
-├── rule_based_langid_param.ipynb
-│
-├── final_model/
-│   ├── __init__.py
-│   ├── configuration.py
-│   ├── load_data.py
-│   ├── rulebased.py
-│   ├── finetuned_xlmroberta.py
-│   └── main.py
+├── final_model/                        # ======= Final Model =======  
+│   ├── __init__.py                     # marks directory as a Python package      
+│   ├── configuration.py                # global configuration and hyperparameters       
+│   ├── load_data.py                    # data loading and basic text preprocessing utilities
+│   ├── rulebased.py                    # rule-based language identification and prefix generation
+│   ├── finetuned_xlmroberta.py         # fine-tuned XLM-RoBERTa model with rule-based token integration
+│   └── main.py                         # main code for training, evaluation, and experiments
 │ 
-├── model_evaluation.ipynb
+├── model_evaluation.ipynb              # compare final model with baselines
 └── README.md
 
 ```
@@ -145,7 +144,7 @@ The mulitple baseline solutions include using both machine learning models and r
 ### Structure
 ```
 94.093-NLP-IE---Language-Identification/
-└── preprocessing/
+├── preprocessing/
 │   ├── data/
 │   │   ├── output_fr.conllu
 │   │   ├── output_ko.conllu
