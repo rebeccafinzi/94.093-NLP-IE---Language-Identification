@@ -5,7 +5,7 @@ MAX_SENTENCES_PER_LANG = 50000
 TEST_RATIO = 0.2
 RANDOM_SEED = 42
 
-NLP_PATH= "/content/drive/MyDrive/NLP"
+NLP_PATH= "/content/drive/.shortcut-targets-by-id/1hjYmjwa3nlwsdTjrNPRO2e_ejJOmrO7n/NLP"
 
 CONLLU_DATA_DIR = f"{NLP_PATH}/preprocessing/data"
 TWITTER_CSV_PATH = f"{NLP_PATH}/final_solution/data/tweets_dataset.csv"
