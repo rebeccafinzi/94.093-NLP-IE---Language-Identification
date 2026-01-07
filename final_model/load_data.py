@@ -8,12 +8,15 @@ import pandas as pd
 from collections import Counter
 
 def clean_text_basic(text):
+    text = re.sub(r"https?://\S+", " ", text)
+
     cleaned_chars = []
     for ch in text:
         if ch.isalpha() or ch.isspace():
             cleaned_chars.append(ch)
         else:
             cleaned_chars.append(" ")
+
     text = "".join(cleaned_chars)
     text = re.sub(r"\s+", " ", text)
     return text.strip()
@@ -82,7 +85,8 @@ def load_twitter_data():
 
     TWITTER_LANG_MAPPING = {
         "en": "en", "de": "de", "es": "es", "fr": "fr",
-        "it": "it", "ko": "ko", "pt": "pt", "ru": "ru"
+        "it": "it", "ko": "ko", "pt": "pt", "ru": "ru", 
+        "be": "be", "ta": "ta"
     }
 
     texts = []
