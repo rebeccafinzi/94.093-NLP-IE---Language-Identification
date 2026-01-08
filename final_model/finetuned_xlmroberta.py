@@ -10,8 +10,9 @@ from tqdm import tqdm
 from .configuration import LANG_CODES
 from .rulebased import RuleTagger
 
-
+# Rule-Augmented XLM-RoBERTa
 class FineTunedRobertaModel:
+    # Initialize model configuration and label mappings
     def __init__(self, tagger: RuleTagger):
         self.tagger = tagger
 
@@ -30,11 +31,13 @@ class FineTunedRobertaModel:
         self.model = None
         self.tokenizer = None
 
+    # Load tokenizer and XLM-RoBERTa model
+    # Add rule-based special tokens
     def _load_model(self):
         print(f"Loading {self.model_name}...")
         self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
 
-        # add tagger's tokens
+        # Add tagger's tokens
         self.tokenizer.add_special_tokens({
             "additional_special_tokens": self.tagger.special_tokens()
         })
@@ -50,24 +53,28 @@ class FineTunedRobertaModel:
         self.model.to(self.device)
         print("Model loaded")
 
+    # Prepend rule-based prefix tokens to input texts
     def _apply_prefixes(self, texts):
         return [f"{self.tagger.prefix(t)} {t}" for t in texts]
 
+    # Fine-tune XLM-RoBERTa on rule-augmented inputs
     def train(self, train_texts, train_labels, max_samples=50_000):
         if self.model is None:
             self._load_model()
 
-        # cap samples like before
+        # Cap samples like before
         if len(train_texts) > max_samples:
             idx = np.random.choice(len(train_texts), max_samples, replace=False)
             train_texts = [train_texts[i] for i in idx]
             train_labels = [train_labels[i] for i in idx]
 
-        # fit rule tagger on the training split
+        # Fit rule tagger on the training split
         self.tagger.fit(train_texts, train_labels)
-
+        
+        # Augment inputs with rule-based prefix tokens
         tagged_texts = self._apply_prefixes(train_texts)
 
+        # Tokenize rule-augmented inputs
         enc = self.tokenizer(
             tagged_texts,
             padding=True,
@@ -80,6 +87,7 @@ class FineTunedRobertaModel:
         dataset = TensorDataset(enc["input_ids"], enc["attention_mask"], y)
         dataloader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True)
 
+        # AdamW optimizer for stable transformer finetuning
         optimizer = AdamW(self.model.parameters(), lr=self.learning_rate)
         self.model.train()
 
@@ -108,6 +116,7 @@ class FineTunedRobertaModel:
 
         print("Completed")
 
+    # Predict languages
     def predict(self, texts):
         if self.model is None or self.tokenizer is None:
             self._load_model()

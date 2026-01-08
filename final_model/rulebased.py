@@ -25,6 +25,7 @@ def _load_stopwords(lang: str, base_dir: str = STOPWORDS_PATH) -> Set[str]:
             out.add(s.lower())
     return out
 
+# Build language specific rules (script, stopwords, special characters)
 def _build_lang_rules(langs: Iterable[str], base_dir: str = STOPWORDS_PATH) -> Dict[str, Dict]:
     meta: Dict[str, Dict] = {
         "en": {"script": "latin", "special_chars": set()},
@@ -85,7 +86,7 @@ class RuleTagger:
         self.ngrams = {lang: {"bi": set(), "tri": set(), "four": set()} for lang in LANG_CODES}
         self.fitted = False
 
-    # Detect Script based on rules
+    # Detect script (latin, cyrillic, hangul, tamil, or mixed)
     def detect_script(self, text: str) -> str:
         has_cyr = has_lat = has_hangul = has_tamil = False
         for ch in text:
@@ -109,16 +110,18 @@ class RuleTagger:
             if has_tamil: return "tamil"
         return "mixed"
 
+    # Tokenize text into lowercase
     def tokenize(self, text: str) -> List[str]:
         return [w.lower() for w in self.WORD_RE.findall(text)]
 
+    # Extract character n-grams
     def char_ngrams(self, text: str, n: int) -> Counter:
         text = text.lower()
         chars = [c for c in text if c.isalpha()]
         grams = ["".join(chars[i:i+n]) for i in range(len(chars) - n + 1)]
         return Counter(grams)
 
-    # Training n-grams
+    # Build top-k character n-grams per language
     def _build_top_ngrams(
         self,
         texts: Iterable[str],
@@ -135,7 +138,8 @@ class RuleTagger:
             c = Counter({g: cnt for g, cnt in c.items() if cnt >= min_freq})
             out[lang] = [g for g, _ in c.most_common(top_k)]
         return out
-
+    
+    # Train language specific character n-grams
     def fit(self, train_texts: List[str], train_labels: List[str]) -> None:
         k = self.cfg.top_k_n_grams
         bi = self._build_top_ngrams(train_texts, train_labels, 2, k)
@@ -176,7 +180,8 @@ class RuleTagger:
             s += self.w["four"] * four_cnt.get(g, 0)
 
         return s
-
+    
+    # Predict language based on rules and compute confidence margin
     def rule_predict(self, text: str) -> Tuple[str, float, float]:
         script = self.detect_script(text)
         candidates = [
@@ -191,6 +196,7 @@ class RuleTagger:
         margin = best_score - second
         return best_lang, best_score, margin
 
+    # Confidence margin -> confidence level (LOW / MID / HIGH)
     def conf_bin(self, best_score: float, margin: float) -> str:
         if best_score <= 0:
             return "LOW"
@@ -200,6 +206,7 @@ class RuleTagger:
             return "MID"
         return "LOW"
 
+    # Generate rule-based prefix tokens for model input
     def prefix(self, text: str) -> str:
         script_tok = self.SCRIPT_TOKEN.get(self.detect_script(text), "<SCRIPT=MIXED>")
 
@@ -210,6 +217,7 @@ class RuleTagger:
         conf = self.conf_bin(best_score, margin)
         return f"{script_tok} <RB={rb_lang}> <RB_CONF={conf}>"
 
+    # Return all special tokens used by the tagger
     def special_tokens(self) -> List[str]:
         script_tokens = list(self.SCRIPT_TOKEN.values())
         rb_lang_tokens = [f"<RB={l}>" for l in LANG_CODES]
