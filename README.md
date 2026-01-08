@@ -534,10 +534,10 @@ Hugging Face: https://huggingface.co/datasets/maaxap/BelarusianGLUE
 [7] Russian Dataset  
 Hugging Face: https://huggingface.co/datasets/MonoHime/ru_sentiment_dataset
 
-[8] German Dataset
+[8] German Dataset  
 Hugging Face: https://huggingface.co/datasets/Alienmaster/german_politicians_twitter_sentiment
 
-[9] English and Spanish Dataset
+[9] English and Spanish Dataset  
 Kaggle: https://www.kaggle.com/datasets/rishantenis/tweets-dataset?utm_source=chatgpt.com
 
 
