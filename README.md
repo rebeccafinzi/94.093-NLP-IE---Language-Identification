@@ -447,8 +447,8 @@ Training samples: 50,000
 
 ## Evaluation
 
-The final model is compared against the baseline using two evaluation settings:  
-  - In-domain evaluation on the Wikipedia test split  
+The final model is compared with the baseline using two evaluation settings:  
+  - In-domain evaluation on the Wikipedia test split (preprocessed CoNLL-U format files)
   - Out-of-distribution evaluation using a twitter dataset  
 
 The Wikipedia test split is used to measure performance on data which has the same distribution as the training data.  
@@ -457,7 +457,9 @@ To evaluate robustness and generalization, an additional OOD evaluation is condu
 ### Out-of-Distribution Dataset (Tweets)
 
 A single tweet dataset covering all target languages was not available.  
-Therefore, the OOD dataset was constructed by combining language specific tweet datasets (or other SNS/informal comment datasets) for each language. [1][2][3][4][5][6][7].  
+Therefore, the OOD dataset was constructed by combining language specific tweet datasets (or other SNS/informal comment datasets) for each language. [1][2][3][4][5][6][7][8].  
+
+For evaluation, around 300 samples were used for each language, ensuring a balanced evaluation setting across all target languages.
 
 This dataset set in a realistic scenario:  
 - text is short and noisy  
@@ -480,6 +482,34 @@ This dataset set in a realistic scenario:
 | XLM-RoBERTa (Final Model) | 0.8878 | 0.90 | 0.89 | 0.89 |
 | Rule-based | 0.8122 | 0.76 | 0.74 | 0.74 |
 | Naive Bayes | 0.6764 | 0.83 | 0.68 | 0.68 |
+
+On Wikipedia test split, Rule-Augmented XLM-RoBERTa achieves the best performance across all metrics, while the rule-based model also performs well.
+On Twitter (out-of-distribution), all models degrade due to noisy and informal text, but XLM-RoBERTa remains the most robust, achieving the highest accuracy and F1-score.
+The rule-based and Naive Bayes baselines show larger performance drops, indicates their domain sensitivity.
+
+Overall, the fine-tuned rule-augmented XLM-RoBERTa shows the highest performance on the robust dataset.
+
+
+#### Confusion Matrix
+<img width="3900" height="2420" alt="confusionmatrix" src="https://github.com/user-attachments/assets/9ae753ef-e03b-4d9c-8808-8f4ed3c9c54e" />
+
+Most errors occur between languages that share the same script (e.g. Latin languages).
+Even in these cases, XLM-RoBERTa has fewer misclassifications than two other baselines.
+For languages with distinct scripts, XLM-RoBERTa consistently achieves almost perfect performance.  
+
+This pattern is observed not only on Wikipedia but also on the robust Twitter dataset.
+
+#### Analysis
+Overall, our final model outperforms all baselines in both in-domain and out-of-domain datasets. 
+However, when evaluated on twitter data (previously unseen data), the performance drops by approximately 9% compared to the Wikipedia test set. 
+This result can be explained by characteristics of the twitter dataset:  
+
+1. The Twitter dataset contains conversational and informal language, where multiple languages are often used in a single tweet.  
+Although our implementation tags such cases as mixed language based on rules, these still negatively affect classification robustness.
+
+2. Tweets often lack sufficient lexical context.
+Tweets often consist of only a few tokens, emojis, hashtags, or user mentions.  
+This lack of context reduces the availability of language specific patterns, especially for languages sharing the same script, making generalization harder for the model.
 
 
 ## References
@@ -504,6 +534,11 @@ Hugging Face: https://huggingface.co/datasets/maaxap/BelarusianGLUE
 [7] Russian Dataset  
 Hugging Face: https://huggingface.co/datasets/MonoHime/ru_sentiment_dataset
 
+[8] German Dataset
+Hugging Face: https://huggingface.co/datasets/Alienmaster/german_politicians_twitter_sentiment
+
+[9] English and Spanish Dataset
+Kaggle: https://www.kaggle.com/datasets/rishantenis/tweets-dataset?utm_source=chatgpt.com
 
 
 
