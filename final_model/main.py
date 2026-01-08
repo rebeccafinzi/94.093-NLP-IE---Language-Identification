@@ -1,13 +1,14 @@
 # main.py
 
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, classification_report
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix, ConfusionMatrixDisplay
 
 from .load_data import load_wikipedia_data, load_twitter_data
 from .finetuned_xlmroberta import FineTunedRobertaModel
 from .configuration import TEST_RATIO, RANDOM_SEED
 from .rulebased import RuleTagger, RuleTaggerConfig
 
+import matplotlib.pyplot as plt
 
 def main():
     # Load Dataset
@@ -41,6 +42,20 @@ def main():
     print(f"\nAccuracy: {wiki_acc:.4f} ({wiki_acc*100:.2f}%)")
     print("\nClassification Report:")
     print(classification_report(wiki_test_labels, wiki_preds))
+    
+    # Confusion Matrix
+    labels = sorted(list(set(wiki_train_labels) | set(wiki_test_labels) | set(wiki_labels)))
+
+    wiki_cm = confusion_matrix(wiki_test_labels, wiki_preds, labels=labels)
+    print("\nConfusion Matrix:")
+    print(wiki_cm)
+
+    disp = ConfusionMatrixDisplay(confusion_matrix=wiki_cm, display_labels=labels)
+    disp.plot(cmap="Blues", values_format="d")
+    plt.title("Confusion Matrix - Wikipedia")
+    plt.xticks(rotation=45, ha="right")
+    plt.tight_layout()
+    plt.show()
 
     # Evaluation on Twitter
     if twitter_texts:
@@ -53,6 +68,18 @@ def main():
         print(f"\nAccuracy: {twitter_acc:.4f} ({twitter_acc*100:.2f}%)")
         print("\nClassification Report:")
         print(classification_report(twitter_labels, twitter_preds))
+        
+        # Confusion Matrix
+        twitter_cm = confusion_matrix(twitter_labels, twitter_preds, labels=labels)
+        print("\nConfusion Matrix:")
+        print(twitter_cm)
+
+        disp = ConfusionMatrixDisplay(confusion_matrix=twitter_cm, display_labels=labels)
+        disp.plot(cmap="Oranges", values_format="d")
+        plt.title("Confusion Matrix - Twitter")
+        plt.xticks(rotation=45, ha="right")
+        plt.tight_layout()
+        plt.show()
 
     # Final summary
     print("\n" + "="*50)
