@@ -484,10 +484,10 @@ This dataset set in a realistic scenario:
 | Naive Bayes | 0.6764 | 0.83 | 0.68 | 0.68 |
 
 On Wikipedia test split, Rule-Augmented XLM-RoBERTa achieves the best performance across all metrics, while the rule-based model also performs well.       
-On Twitter (out-of-distribution), all models degrade due to noisy and informal text, but XLM-RoBERTa remains the most robust, achieving the highest accuracy and F1-score.        
+On Twitter (out-of-distribution), all models degrade due to noisy and informal text, but Rule-Augmented XLM-RoBERTa remains the most robust, achieving the highest accuracy and F1-score.        
 The rule-based and Naive Bayes baselines show larger performance drops, indicates their domain sensitivity.
 
-Overall, the fine-tuned rule-augmented XLM-RoBERTa shows the highest performance on the robust dataset.
+Overall, the fine-tuned Rule-Augmented XLM-RoBERTa shows the highest performance on the robust dataset.
 
 
 #### Confusion Matrix
