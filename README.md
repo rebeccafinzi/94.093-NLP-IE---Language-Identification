@@ -375,3 +375,137 @@ The model was evaluated on the 20% test set, comprising **1,333,876 sentences**.
 
 #### Training with SVC model 
 SVC was attempted for comparison, but encountered severe scalability limitations. Training the SVC model on the full 5.3 million sample set proved infeasible. The process was terminated after running for over 48 hours without completion, confirming that SVC is not a practical choice for this scale of data without significant infrastructure optimization. While training the model with limited samples (100 samples), it provided an accuracy of ~60%. 
+
+
+---
+
+## Final Model - Rule-Augmented XLM-RoBERTa
+
+This model identify langauges by combining:  
+- a rule-based language detector (script, stopwords, character n-grams)  
+- XLM-RoBERTa
+
+### Structure
+```
+final_model/
+├── configuration.py        # Global settings and paths
+├── load_data.py            # Training data loading
+├── rulebased.py            # Rule-based language tagger
+├── finetuned_xlmroberta.py # Rule-augmented XLM-RoBERTa fine-tuning
+├── main.py                 # Training + evaluation pipeline
+└── __init__.py
+```
+
+### Key Idea
+
+Rule-based model extracts explicit linguistic signals:  
+  - writing system (Latin / Cyrillic / Hangul / Tamil)  
+  - stopwords  
+  - special characters  
+  - character n-grams
+
+These signals are converted into **special tokens**.  
+The tokens are prepended to the input text.  
+XLM-RoBERTa is fine-tuned on this enriched input, allowing its internal parameters to learn the rule-based signals during training.  
+
+#### Rule-Based Tag
+
+Each input is prefixed with tokens such as:
+```
+<SCRIPT=CYRILLIC> <RB=ru> <RB_CONF=HIGH>
+```
+
+These tokens encode:  
+- detected writing system  
+- rule-based language prediction  
+- confidence level  
+
+They are treated as learnable tokens during fine tuning.
+
+### How to Run
+
+From the project root:
+```
+python3 -m final_model.main
+```
+- Load Wikipedia data   
+- Split train/test  
+- Train rule-augmented XLM-RoBERTa  
+- Evaluation  
+
+### Model Details
+
+Base model: xlm-roberta-base  
+Max sequence length: 128  
+Epochs: 3  
+Batch size: 32  
+Optimizer: AdamW  
+Learning rate: 2e-5  
+Training samples: 50,000  
+
+---
+
+## Evaluation
+
+The final model is compared against the baseline using two evaluation settings:  
+  - In-domain evaluation on the Wikipedia test split  
+  - Out-of-distribution evaluation using a twitter dataset  
+
+The Wikipedia test split is used to measure performance on data which has the same distribution as the training data.  
+To evaluate robustness and generalization, an additional OOD evaluation is conducted on social media text.  
+
+### Out-of-Distribution Dataset (Tweets)
+
+A single tweet dataset covering all target languages was not available.  
+Therefore, the OOD dataset was constructed by combining language specific tweet datasets (or other SNS/informal comment datasets) for each language. [1][2][3][4][5][6][7].  
+
+This dataset set in a realistic scenario:  
+- text is short and noisy  
+- grammar is inconsistent  
+
+### Results
+
+#### Wikipedia
+
+| Model | Accuracy | Precision (Macro) | Recall (Macro) | F1-score (Macro) |
+|------|----------|-------------------|----------------|------------------|
+| XLM-RoBERTa (Final Model) | 0.9842 | 0.98 | 0.98 | 0.98 |
+| Rule-based | 0.9488 | 0.95 | 0.95 | 0.95 |
+| Naive Bayes | 0.8599 | 0.91 | 0.86 | 0.87 |
+
+#### Twitter
+
+| Model | Accuracy | Precision (Macro) | Recall (Macro) | F1-score (Macro) |
+|------|----------|-------------------|----------------|------------------|
+| XLM-RoBERTa (Final Model) | 0.8878 | 0.90 | 0.89 | 0.89 |
+| Rule-based | 0.8122 | 0.76 | 0.74 | 0.74 |
+| Naive Bayes | 0.6764 | 0.83 | 0.68 | 0.68 |
+
+
+## References
+[1] Italian Tweets Dataset  
+Hugging Face: https://huggingface.co/datasets/pere/italian_tweets_500k
+
+[2] Korean SNS Dataset  
+Hugging Face: https://huggingface.co/datasets/ehznapsxm/kor_sns_korea_5
+
+[3] Tamil Tweets Dataset  
+Kaggle: https://www.kaggle.com/datasets/kracekumar/tamil-binary-classification-1k-tweets-labels-v1
+
+[4] French Tweets Dataset  
+Hugging Face: https://huggingface.co/datasets/FrancophonIA/french_tweets
+
+[5] Portuguese Tweets Dataset  
+Hugging Face: https://huggingface.co/datasets/fpaulino/portuguese-tweets
+
+[6] Belarusian Dataset  
+Hugging Face: https://huggingface.co/datasets/maaxap/BelarusianGLUE
+
+[7] Russian Dataset  
+Hugging Face: https://huggingface.co/datasets/MonoHime/ru_sentiment_dataset
+
+
+
+
+
+
