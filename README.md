@@ -539,7 +539,7 @@ Hugging Face: https://huggingface.co/datasets/MonoHime/ru_sentiment_dataset
 Hugging Face: https://huggingface.co/datasets/Alienmaster/german_politicians_twitter_sentiment
 
 [9] English and Spanish Dataset  
-
+kaggle: https://www.kaggle.com/datasets/mmmarchetti/tweets-dataset/code
 
 
 
